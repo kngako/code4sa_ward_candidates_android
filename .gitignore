@@ -38,3 +38,6 @@ captures/
 
 # Keystore files
 *.jks
+
+# Google Services File
+google-services.json

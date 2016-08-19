@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:gravity="center_vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:minHeight="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
+
+    <RelativeLayout
+        android:layout_margin="8dp"
+        android:layout_centerVertical="true"
+        android:id="@+id/candidate_wrapper"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:text="Candidate Name and Details... might be a lot of stuff..."
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:layout_margin="4dp"
+            android:textColor="@android:color/black"
+            android:id="@+id/candidate_name"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:text="Candidate Name and Details... might be a lot of stuff..."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_margin="4dp"
+            android:id="@+id/candidate_age"
+            android:layout_below="@+id/candidate_name"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:text="AGE 54"
+            android:textStyle="italic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_margin="4dp"
+            android:layout_below="@+id/candidate_age"
+            android:id="@+id/candidate_party"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall"
+            android:text="Party Name and Details... might be a lot of stuff..."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_margin="4dp"
+            android:id="@+id/candidate_contesting"
+            android:layout_below="@+id/candidate_party"
+            android:gravity="center"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="Contesting for 3 wards"
+            android:textStyle="italic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+
+
+    </RelativeLayout>

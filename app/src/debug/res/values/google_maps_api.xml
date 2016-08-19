@@ -9,5 +9,5 @@
     string in this file.
     -->
     <!-- TODO: Remove to KEY to upload on Github -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">YOUR_API_KEY_HERE</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCEZHvootNp-_WW7kHNQo5iyXfreDLIC5U</string>
 </resources>

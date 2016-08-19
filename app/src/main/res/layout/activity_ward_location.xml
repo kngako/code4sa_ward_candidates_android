@@ -4,6 +4,7 @@
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:background="@android:color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="za.co.eregardless.kngako.mywardcandidates.WardLocationActivity">
@@ -15,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
             <LinearLayout
                 android:id="@+id/logo"
                 android:orientation="vertical"
@@ -24,6 +26,7 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_marginBottom="8dp"
                     android:paddingBottom="8dp"
                     android:layout_marginTop="16dp"
@@ -33,30 +36,110 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:text="Who Are You Voting For"
+                    android:layout_marginTop="8dp"
+                    android:paddingTop="8dp"
+                    android:text="Who can I vote for?"
+                    android:textStyle="bold"
                     android:textAppearance="?android:textAppearanceLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="14dp"
-                    android:paddingBottom="14dp"
+                    android:paddingBottom="10dp"
                     />
+
+                <TextView
+                    android:text="#SAElections2016"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dp"
+                    />
+
+                <Button
+                    android:id="@+id/button_pick"
+                    android:layout_below="@+id/logo"
+                    android:layout_centerHorizontal="true"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:gravity="center"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_marginBottom="14dp"
+                    android:text="Find your ward/location"
+                    android:background="@drawable/location_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/location_text"
-                android:layout_below="@+id/logo"
-                android:layout_margin="10dp"
-                android:textAppearance="?android:textAppearanceLarge"
-                android:gravity="center"
-                android:text="Pick your location"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/appinvite"
+                android:layout_margin="6dp"
+                android:src="@android:drawable/ic_menu_share"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <RelativeLayout
+                android:id="@+id/text_wrapper"
+                android:layout_below="@+id/logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/location_text"
+                    android:layout_margin="10dp"
+                    android:visibility="gone"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:gravity="center"
+                    android:text="Pick your location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/results_container"
+                    android:layout_below="@+id/location_text"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:gravity="center"
+                        android:text="Waiting for this years results..."
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:gravity="center"
+                        android:text="National Results in 2014"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <WebView
+                        android:id="@+id/results_2014"
+                        android:layout_below="@+id/location_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:gravity="center"
+                        android:text="Municipal Results in 2011"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <WebView
+                        android:id="@+id/results_2011"
+                        android:layout_below="@+id/results_2014"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+            </RelativeLayout>
 
             <!-- TODO: Replace this with a ListView or RecyclerView... -->
             <LinearLayout
-                android:id="@+id/result_list"
-                android:layout_below="@+id/location_text"
+                android:id="@+id/candidate_list"
+                android:layout_below="@+id/text_wrapper"
                 android:orientation="vertical"
                 android:layout_margin="@dimen/place_autocomplete_progress_horizontal_margin"
                 android:layout_width="match_parent"
@@ -74,7 +157,7 @@
                 android:id="@+id/loading_container"
                 android:layout_margin="16dp"
                 android:orientation="vertical"
-                android:layout_below="@+id/result_list"
+                android:layout_below="@+id/candidate_list"
                 android:layout_centerInParent="true"
                 android:visibility="visible"
                 android:gravity="center_horizontal"
@@ -100,7 +183,41 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
+
+
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/demographics_container"
+                android:layout_below="@+id/candidate_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:gravity="center"
+                    android:text="Ward Demographics"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <WebView
+                    android:id="@+id/age_demographics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <WebView
+                    android:id="@+id/race_demographics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_below="@+id/demographics_container"
+                android:visibility="invisible"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"/>
 
 
 
@@ -109,6 +226,7 @@
 
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/pick_location"
+        android:visibility="gone"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
@@ -118,4 +236,43 @@
         android:layout_height="wrap_content"
         />
 
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="64dp">
+        <ImageView
+            android:id="@+id/code_bridge"
+            android:src="@drawable/cb"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/eregardless"
+            android:src="@drawable/eregardless"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/wazimaps"
+            android:src="@drawable/wazimap"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/c4sa"
+            android:src="@drawable/c4sa"
+            android:layout_margin="6dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </RelativeLayout>
