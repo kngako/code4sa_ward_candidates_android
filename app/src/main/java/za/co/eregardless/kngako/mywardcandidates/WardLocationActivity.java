@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -33,6 +32,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceFilter;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -42,22 +42,17 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
-import com.google.firebase.iid.FirebaseInstanceId;
 
 /**
  * TODO:
@@ -97,7 +92,7 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
 
     private OkHttpClient client = new OkHttpClient();
     private final String wardURL = "http://mapit.code4sa.org/point/4326/%s,%s?generation=2&type=WD";
-    private final String candidateURL = "http://41.185.29.119:5000/api?address=&lat=%s&lon=%s";
+    private final String candidateURL = "http://41.185.29.119:5000/api/councillors?lat=%s&lon=%s";
 
     private final String waziMap2014 = "<iframe id=\"cr-embed-ward-%s-elections-national_2014-party_distribution\" class=\"census-reporter-embed\" src=\"https://wazimap.co.za/embed/iframe.html?geoID=ward-%s&chartDataID=elections-national_2014-party_distribution&dataYear=2014&chartType=histogram&chartHeight=200&chartQualifier=&chartTitle=Voters+by+party&initialSort=&statType=scaled-percentage\" frameborder=\"0\" height=\"300\" style=\"margin: 1em; max-width: 720px; float: right;\"></iframe>\n" +
             "<script src=\"https://wazimap.co.za/static/js/embed.chart.make.js\"></script>";
@@ -198,13 +193,47 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
             }
         });
 
+        findViewById(R.id.current_location).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(WardLocationActivity.this, "Getting results for your current location" , Toast.LENGTH_LONG).show();
+                loadingContainer.setVisibility(View.VISIBLE);
+
+                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                    .getCurrentPlace(mGoogleApiClient, null);
+
+                result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                    @Override
+                    public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                        if(likelyPlaces.getCount() > 0) {
+//                            likelyPlaceBounds = likelyPlaces.get(0).getPlace().getViewport();
+//                            likelyPlaceAddress = likelyPlaces.get(0).getPlace().getName().toString();
+                            Toast.makeText(WardLocationActivity.this, "Appromixate location at: " + likelyPlaces.get(0).getPlace().getAddress().toString(), Toast.LENGTH_LONG).show();
+                            locationText.setText(likelyPlaces.get(0).getPlace().getAddress().toString());
+                            locationText.setVisibility(View.VISIBLE);
+                            locationText.setTextColor(Color.BLACK);
+
+                            getCandidates(likelyPlaces.get(0).getPlace().getLatLng());
+        //                    Snackbar.make(findViewById(R.id.container), "Appromixate location at: " + likelyPlaceAddress, Snackbar.LENGTH_LONG).show();
+                            Log.i(TAG, String.format("Place '%s' has likelihood: %g",
+                                    likelyPlaces.get(0).getPlace().getName(),
+                                    likelyPlaces.get(0).getLikelihood()));
+                        }
+
+                        if(!actionPerformded)
+                            loadingContainer.setVisibility(View.GONE);
+
+                        likelyPlaces.release();
+                    }
+                });
+            }
+        });
         findViewById(R.id.appinvite).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
                     String deepLinkUrl = "https://play.google.com/store/apps/details?id=com.eregardless.dololo";
                     String imageUrl = "";
-
 
                     Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                             .setMessage(getString(R.string.invitation_message))
@@ -230,29 +259,8 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
         if (!((LocationManager) getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             showGPSPrompt();
         }
-
-        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                .getCurrentPlace(mGoogleApiClient, null);
-
-        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-            @Override
-            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                if(likelyPlaces.getCount() > 0) {
-                    likelyPlaceBounds = likelyPlaces.get(0).getPlace().getViewport();
-                    likelyPlaceAddress = likelyPlaces.get(0).getPlace().getAddress().toString();
-                    Toast.makeText(WardLocationActivity.this, "Appromixate location at: " + likelyPlaceAddress, Toast.LENGTH_LONG).show();
-//                    Snackbar.make(findViewById(R.id.container), "Appromixate location at: " + likelyPlaceAddress, Snackbar.LENGTH_LONG).show();
-                    Log.i(TAG, String.format("Place '%s' has likelihood: %g",
-                            likelyPlaces.get(0).getPlace().getName(),
-                            likelyPlaces.get(0).getLikelihood()));
-                }
-
-                if(!actionPerformded)
-                    loadingContainer.setVisibility(View.GONE);
-
-                likelyPlaces.release();
-            }
-        });
+//
+        loadingContainer.setVisibility(View.GONE);
 
         pickPlace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,14 +273,15 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
                             .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                             .build());
 
-                    if(likelyPlaceBounds != null ){
-                        builder.setBoundsBias(likelyPlaceBounds);
-                    }
-                    if(likelyPlaceAddress != null ){
-                        if(likelyPlaceAddress.length() > MAX_AUTO_COMPLETE_LENGTH)
-                            likelyPlaceAddress = likelyPlaceAddress.substring(0, MAX_AUTO_COMPLETE_LENGTH -1);
-                        builder.zzkv(likelyPlaceAddress);
-                    }
+//                    if(likelyPlaceBounds != null ){
+//                        builder.setBoundsBias(likelyPlaceBounds);
+//                    }
+//                    if(likelyPlaceAddress != null ){
+//                        if(likelyPlaceAddress.length() > MAX_AUTO_COMPLETE_LENGTH)
+//                            likelyPlaceAddress = likelyPlaceAddress.substring(0, MAX_AUTO_COMPLETE_LENGTH -1);
+//                        builder.zzkv(likelyPlaceAddress);
+//                        likelyPlaceAddress = null;
+//                    }
                     Intent intent = builder.build(WardLocationActivity.this);
 
                     startActivityForResult(intent, REQUEST_PLACE_PICKER);
@@ -328,7 +337,7 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
 
-                locationText.setText(place.getName() + ": " + place.getAddress());
+                locationText.setText(place.getAddress());
                 locationText.setVisibility(View.VISIBLE);
                 locationText.setTextColor(Color.BLACK);
 
@@ -402,45 +411,38 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
                     final JSONObject jsonResult = new JSONObject(contents);
                     final String ward = jsonResult.getString("ward");
 
-
+                    final JSONArray candidates = jsonResult.getJSONArray("proportional representation");
+                    final JSONArray councillor = jsonResult.getJSONArray("councillor");
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
-                            text.setText("Detected Ward No: " + ward);
-                            text.setGravity(Gravity.CENTER);
 
-                            candidateList.addView(text);
+                            TextView councilorName = (TextView) findViewById(R.id.councillor_name);
+                            TextView councilorMunicipality = (TextView) findViewById(R.id.councillor_municipality);
+                            TextView councilorParty = (TextView) findViewById(R.id.councillor_party);
 
-                            results2011.loadData(String.format(waziMap2011, ward, ward), "text/html",
-                                    "utf-8");
-                            results2014.loadData(String.format(waziMap2014, ward, ward), "text/html",
-                                    "utf-8");
-
-                            ageDemographics.loadData(String.format(waziMapAGE, ward, ward), "text/html",
-                                    "utf-8");
-                            raceDemographics.loadData(String.format(waziMapRace, ward, ward), "text/html",
-                                    "utf-8");
-
-                            waziMapIcon.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(wazimapWardURL));
-                                    startActivity(Intent.createChooser(browserIntent, "Visit Wazimap"));
+                            if(councillor.length() > 0){
+                                try {
+                                    councilorMunicipality.setText(councillor.getJSONObject(0).getString("Seat Type").trim() + " - " + councillor.getJSONObject(0).getString("Municipality").trim());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                            resultsContainer.setVisibility(View.VISIBLE);
-                            demographicsContainer.setVisibility(View.VISIBLE);
-                        }
-                    });
+                                try {
+                                    councilorName.setText(councillor.getJSONObject(0).getString("Fullname").trim() + " " + councillor.getJSONObject(0).getString("Surname").trim());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    councilorParty.setText(councillor.getJSONObject(0).getString("Party").trim() );
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                councilorName.setText("Not yet know");
+                                councilorParty.setText("Proportional Representation");
+                                councilorMunicipality.setText("will decide your municipality");
 
-                    final JSONArray candidates = jsonResult.getJSONArray("candidates");
-                    Log.d(TAG, "Candidates: " + candidates.length());
-                    if(candidates.length() > 0){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
                                 for(int i = 0; i < candidates.length(); i++){
 
                                     try {
@@ -450,21 +452,18 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
                                         if(i != 0)
                                             candidateList.addView(getLayoutInflater().inflate(R.layout.seperator, candidateList, false));
 
-                                        View root = getLayoutInflater().inflate(R.layout.candidate_row, candidateList, false);
+                                        View root = getLayoutInflater().inflate(R.layout.councillor_row, candidateList, false);
                                         final TextView resultName = (TextView) root.findViewById(R.id.candidate_name);
-                                        final TextView resultAge = (TextView) root.findViewById(R.id.candidate_age);
                                         final TextView resultParty = (TextView) root.findViewById(R.id.candidate_party);
-                                        final TextView resultContesting = (TextView) root.findViewById(R.id.candidate_contesting);
+                                        final TextView resultPROrder = (TextView) root.findViewById(R.id.candidate_pr_no);
 
                                         String candidateName = candidate.getString("Fullname").trim() + " " + candidate.getString("Surname").trim() ;
                                         String candidateParty = candidate.getString("Party").trim();
-                                        String candidateAge = candidate.getString("age");
-                                        int wardsContesting = candidate.getJSONArray("wards").length();
+                                        String candidatePR = candidate.getString("Seat Type").trim() + " - " +  candidate.getString("Ward").trim();
 
                                         resultName.setText(candidateName);
                                         resultParty.setText(candidateParty);
-                                        resultAge.setText("Age: " + candidateAge);
-                                        resultContesting.setText("Contesting for " + wardsContesting + " ward(s)");
+                                        resultPROrder.setText(candidatePR);
                                         try {
 
                                             final String googleUrl = "https://www.google.com/search?q=" + URLEncoder.encode(candidateName + " - " + candidateParty, "utf-8");
@@ -517,19 +516,50 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
 
                                 }
                             }
-                        });
 
-                    } else {
+                            TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
+                            text.setText("Ward No " + ward + " proportional representation");
+                            text.setGravity(Gravity.CENTER);
+
+                            candidateList.addView(text);
+
+                            results2011.loadData(String.format(waziMap2011, ward, ward), "text/html",
+                                    "utf-8");
+                            results2014.loadData(String.format(waziMap2014, ward, ward), "text/html",
+                                    "utf-8");
+
+                            ageDemographics.loadData(String.format(waziMapAGE, ward, ward), "text/html",
+                                    "utf-8");
+                            raceDemographics.loadData(String.format(waziMapRace, ward, ward), "text/html",
+                                    "utf-8");
+
+                            waziMapIcon.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(wazimapWardURL));
+                                    startActivity(Intent.createChooser(browserIntent, "Visit Wazimap"));
+                                }
+                            });
+                            resultsContainer.setVisibility(View.VISIBLE);
+                            demographicsContainer.setVisibility(View.VISIBLE);
+                        }
+                    });
+
+
+
+
+
+
+                    Log.d(TAG, "proportional representation: " + candidates.length());
+                    if(candidates.length() == 0){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
                                 text.setText("Unfortanetly your ward isn't currently in the database :(");
-
                                 candidateList.addView(text);
                             }
                         });
-
                     }
                     runOnUiThread(new Runnable() {
                         @Override
@@ -547,99 +577,4 @@ public class WardLocationActivity extends FragmentActivity implements GoogleApiC
         });
 
     }
-
-//    private void getWardNumber(final LatLng latLng) {
-//        Log.d(TAG, "Getting ward number for: " + String.format(wardURL, latLng.longitude, latLng.latitude ));
-//
-//
-//
-//        Request request = new Request.Builder()
-//                .url(String.format(wardURL, latLng.longitude, latLng.latitude ))
-//                .build();
-//
-//        client.newCall(request).enqueue(new Callback() {
-//
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                e.printStackTrace();
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        actionPerformded = true;
-//
-//                        if(loadingContainer.getVisibility() != View.VISIBLE)
-//                            loadingContainer.setVisibility(View.VISIBLE);
-//
-//                        TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
-//                        text.setText("Internet problems... check data or proxy... :(");
-//
-//                        candidateList.addView(text);
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                String contents = response.body().string();
-//                Log.d(TAG, "Retrieved: " + contents);
-//
-//                JSONObject jsonResult  = null;
-//                try {
-//                    jsonResult = new JSONObject(contents);
-//                    Log.d(TAG, "Names: " + jsonResult.length());
-//                    if(jsonResult.length() > 0){
-//                        // TODO: Process
-//
-//                        final String ward = jsonResult.getJSONObject(jsonResult.keys().next()).getString("name");
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
-//                                text.setText("Detected Ward No: " + ward);
-//                                text.setGravity(Gravity.CENTER);
-//                                candidateList.addView(text);
-//                            }
-//                        });
-//
-//                    } else {
-//                        // TODO: tell user that none was found...
-//                        // Let them know their ward number...
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
-//                                text.setText("No ward data for your location");
-//                                text.setGravity(Gravity.CENTER_HORIZONTAL);
-//
-//                                candidateList.addView(text);
-//                            }
-//                        });
-//
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            TextView text = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, candidateList, false);
-//                            text.setText("Your ward is really hard to look up");
-//
-//                            candidateList.addView(text);
-//                        }
-//                    });
-//                }
-//
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        actionPerformded = false;
-//
-//                        loadingContainer.setVisibility(View.GONE);
-//                    }
-//                });
-//
-//            }
-//        });
-//    }
 }

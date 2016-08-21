@@ -16,11 +16,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
             <LinearLayout
                 android:id="@+id/logo"
                 android:orientation="vertical"
                 android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
                 android:background="@color/colorPrimaryDark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -36,26 +37,39 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:layout_marginTop="8dp"
-                    android:paddingTop="8dp"
-                    android:text="Who can I vote for?"
+                    android:paddingTop="16dp"
+                    android:text="Who is your new Ward Councillor?"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textAppearance="?android:textAppearanceLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="10dp"
                     />
 
-                <TextView
-                    android:text="#SAElections2016"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="10dp"
-                    />
+                <LinearLayout
+                    android:id="@+id/appinvite"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/button_pick"
+                    <ImageView
+                        android:layout_margin="6dp"
+                        android:src="@android:drawable/ic_menu_share"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="#SAElections2016"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        />
+
+                </LinearLayout>
+
+                <RelativeLayout
                     android:layout_below="@+id/logo"
                     android:layout_centerHorizontal="true"
                     android:textAppearance="?android:textAppearanceLarge"
@@ -64,18 +78,42 @@
                     android:paddingRight="16dp"
                     android:layout_marginBottom="14dp"
                     android:text="Find your ward/location"
-                    android:background="@drawable/location_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/button_pick"
+                        android:layout_toLeftOf="@+id/current_location"
+                        android:drawableLeft="@android:drawable/ic_dialog_map"
+                        android:layout_alignParentLeft="true"
+                        android:drawablePadding="6dp"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:gravity="center"
+                        android:text="Enter Street Address"
+                        android:background="@drawable/location_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageButton
+                        android:id="@+id/current_location"
+                        android:layout_marginLeft="6dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignBottom="@+id/button_pick"
+                        android:layout_alignTop="@+id/button_pick"
+                        android:background="@drawable/location_button"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:src="@android:drawable/ic_menu_compass"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
+
+
+
 
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/appinvite"
-                android:layout_margin="6dp"
-                android:src="@android:drawable/ic_menu_share"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+
 
             <RelativeLayout
                 android:id="@+id/text_wrapper"
@@ -101,42 +139,52 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:textAppearance="?android:textAppearanceSmall"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="Your Councillor is"
                         android:gravity="center"
-                        android:text="Waiting for this years results..."
+                        android:layout_marginBottom="12dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <TextView
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:id="@+id/councillor_name"
                         android:gravity="center"
-                        android:text="National Results in 2014"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:text="Not yet know."
+                        android:textColor="@android:color/black"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-
-                    <WebView
-                        android:id="@+id/results_2014"
-                        android:layout_below="@+id/location_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:id="@+id/councillor_party"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/black"
                         android:gravity="center"
-                        android:text="Municipal Results in 2011"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:text="Proportional Representation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
-                    <WebView
-                        android:id="@+id/results_2011"
-                        android:layout_below="@+id/results_2014"
+                    <TextView
+                        android:id="@+id/councillor_municipality"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:gravity="center"
+                        android:text="will decide your municipality"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:paddingTop="18dp"
+                        android:gravity="center"
+                        android:text="SMS your ID number to 32245\nand get your Municapilty contact details\n(R1 per sms)"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
             </RelativeLayout>
 
             <!-- TODO: Replace this with a ListView or RecyclerView... -->
+
             <LinearLayout
                 android:id="@+id/candidate_list"
                 android:layout_below="@+id/text_wrapper"
@@ -159,7 +207,7 @@
                 android:orientation="vertical"
                 android:layout_below="@+id/candidate_list"
                 android:layout_centerInParent="true"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -184,7 +232,6 @@
                     android:layout_height="wrap_content" />
 
 
-
             </LinearLayout>
 
             <LinearLayout
@@ -194,6 +241,39 @@
                 android:layout_below="@+id/candidate_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <TextView
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:gravity="center"
+                    android:text="Looking back at other years..."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:gravity="center"
+                    android:text="National Results in 2014"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <WebView
+                    android:id="@+id/results_2014"
+                    android:layout_below="@+id/location_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:gravity="center"
+                    android:text="Municipal Results in 2011"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <WebView
+                    android:id="@+id/results_2011"
+                    android:layout_below="@+id/results_2014"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:gravity="center"

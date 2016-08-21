@@ -29,18 +29,7 @@
 
         <TextView
             android:layout_margin="4dp"
-            android:id="@+id/candidate_age"
             android:layout_below="@+id/candidate_name"
-            android:gravity="center"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:text="AGE 54"
-            android:textStyle="italic"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_margin="4dp"
-            android:layout_below="@+id/candidate_age"
             android:id="@+id/candidate_party"
             android:textStyle="bold"
             android:textColor="@android:color/black"
@@ -52,7 +41,7 @@
 
         <TextView
             android:layout_margin="4dp"
-            android:id="@+id/candidate_contesting"
+            android:id="@+id/candidate_pr_no"
             android:layout_below="@+id/candidate_party"
             android:gravity="center"
             android:textAppearance="?android:textAppearanceSmall"

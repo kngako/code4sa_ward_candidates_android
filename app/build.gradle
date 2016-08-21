@@ -7,8 +7,8 @@ android {
         applicationId 'za.co.eregardless.kngako.mywardcandidates'
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 9
-        versionName "1.212"
+        versionCode 10
+        versionName "1.222"
     }
     buildTypes {
         release {
